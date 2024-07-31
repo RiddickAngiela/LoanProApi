@@ -6,16 +6,18 @@ const bodyParser = require('body-parser');
 const multer = require('multer');
 const { sequelize } = require('./models');
 const userRoutes = require('./routes/users');
+const loanRoutes = require('./routes/loans'); // Add this line
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json()); // Middleware to parse JSON requests
-app.use('/uploads', express.static('uploads')); // Serve static files from the 'uploads' directory
+app.use('/uploads', express.static('uploads')); 
 
-// Use user routes
+// Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/loans', loanRoutes); // Add this line
 
 // Basic route
 app.get('/', (req, res) => {
@@ -32,7 +34,7 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error('Error syncing database:', error);
-    process.exit(1); // Exit with error code if sync fails
+    process.exit(1); 
   }
 };
 

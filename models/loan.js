@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   }, {});
-
+  
   Loan.associate = function(models) {
     // associations can be defined here
   };

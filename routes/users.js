@@ -42,19 +42,23 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Logging in user:', { email });
+    console.log('Logging in user:',  password);
 
     // Find user
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid credentials 1' });
     }
+    console.log(user.password);
 
     // Check password
     const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    console.log(match);
+    if (match===true) {
+      return res.status(401).json({ error: 'Invalid credentials 2' });
     }
+
+    console.log(match)
 
     // Generate JWT token
     const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, { expiresIn: '1h' });
