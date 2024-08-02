@@ -63,3 +63,23 @@ This is the backend for a loan application built using Node.js, Express, and Seq
    ```bash
    git clone https://github.com/yourusername/loan-app-backend.git
    cd loan-app-backend
+
+
+## File Structure
+loan-app-backend/
+├── src/
+│   ├── controllers/       # Controllers for handling API requests
+│   ├── middlewares/       # Middleware functions for authentication and authorization
+│   ├── models/            # Sequelize models
+│   ├── routes/            # API routes
+│   ├── uploads/           # File upload handling
+│   ├── utilities/         # Utility functions
+│   ├── views/             # Views for document generation
+│   ├── app.js             # Main application file
+│   ├── config.js          # Configuration settings
+│   └── server.js          # Server setup and initialization
+├── .env                   # Environment variables
+├── .gitignore             # Git ignore file
+├── package.json           # Project metadata and dependencies
+├── README.md              # This README file
+└── sequelize-config.js    # Sequelize configuration file
