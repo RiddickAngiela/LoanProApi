@@ -8,8 +8,11 @@ const path = require('path');
 const { generatePdfWithChart } = require('./utils/pdfUtils');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const uploadPath = 'uploads/';
+
+// Retrieve JWT secret from environment variables
+const jwtSecret = process.env.JWT_SECRET;
 
 // Middleware
 app.use(bodyParser.json()); // Middleware to parse JSON requests

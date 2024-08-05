@@ -12,7 +12,7 @@ This is the backend for a loan application built using Node.js, Express, and Seq
 - [Project Submission](#project-submission)
 
 ## Features
-- **Database Connection**: Connects to a relational database (e.g., MySQL, PostgreSQL) with migration support.
+- **Database Connection**: Connects to a relational database (e.g., MySQL) with migration support.
 - **Database Management**: Handles relations between tables and supports complex join queries.
 - **API Development**: CRUD operations for records.
 - **File Handling**: Utility for document, image, and file uploads with image resizing functionality.

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const { User } = require('../models');
@@ -8,11 +9,12 @@ const jwt = require('jsonwebtoken');
 // Retrieve JWT secret from environment variables
 const jwtSecret = process.env.JWT_SECRET;
 
+
+
 // Register a new user
 router.post('/register', async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
-    console.log('Registering user:', { email, firstName, lastName });
 
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -22,6 +24,7 @@ router.post('/register', async (req, res) => {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('Hashed Password:', hashedPassword); // Log the hashed password
 
     // Create new user
     const newUser = await User.create({
@@ -42,26 +45,28 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Logging in user:',  password);
+    console.log('Login request received:', req.body);
 
     // Find user
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials 1' });
+      console.log('User not found:', email);
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-    console.log(user.password);
+
+    console.log('User found, hashed password:', user.password); // Log the hashed password
 
     // Check password
     const match = await bcrypt.compare(password, user.password);
-    console.log(match);
-    if (match===true) {
-      return res.status(401).json({ error: 'Invalid credentials 2' });
+    console.log('Password match:', match); // Log the result of the comparison
+
+    if (match === true) {
+      console.log('Password mismatch for user:', email);
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
-
-    console.log(match)
-
+    console.log('userId',user.id, user.role);
     // Generate JWT token
-    const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, { expiresIn: '1h' });
+     const token = jwt.sign({ userId: user.id, role: user.role }, jwtSecret, { expiresIn: '24h' });
 
     res.status(200).json({ token });
   } catch (error) {
