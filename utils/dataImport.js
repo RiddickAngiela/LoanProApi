@@ -1,40 +1,22 @@
 // utils/dataImport.js
-const XLSX = require('xlsx');
-const validator = require('validator');
+const xlsx = require('xlsx');
 
-// Function to read and parse the Excel file
 const readExcelFile = (filePath) => {
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0]; // Assume the first sheet
-  const sheet = workbook.Sheets[sheetName];
-  const data = XLSX.utils.sheet_to_json(sheet);
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const data = xlsx.utils.sheet_to_json(worksheet);
   return data;
 };
 
-// Function to validate data
 const validateData = (data) => {
-  return data.map((item) => {
-    let errors = [];
+  return data.map(item => {
+    const errors = [];
+    if (!item.amount || isNaN(item.amount)) errors.push('Invalid amount');
+    if (!item.term || isNaN(item.term)) errors.push('Invalid term');
+    if (!item.name || item.name.trim() === '') errors.push('Name is required');
 
-    // Check for missing required fields
-    if (!item.name || typeof item.name !== 'string') {
-      errors.push('Missing or invalid name');
-    }
-
-    if (!item.email || !validator.isEmail(item.email)) {
-      errors.push('Invalid email address');
-    }
-
-    if (!item.phone || !validator.isMobilePhone(item.phone, 'any', { strictMode: false })) {
-      errors.push('Invalid phone number');
-    }
-
-    // Additional validations can be added here
-
-    return {
-      ...item,
-      errors: errors.length > 0 ? errors : null
-    };
+    return { ...item, errors: errors.length > 0 ? errors : null };
   });
 };
 

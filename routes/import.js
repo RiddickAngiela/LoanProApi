@@ -2,11 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const multer = require('multer');
 const { readExcelFile, validateData } = require('../utils/dataImport');
-const { sequelize, models } = require('../models'); // Ensure this path is correct
+const { sequelize, models } = require('../models');
+
+// Set up multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
 // Import data route
-router.post('/import', async (req, res) => {
+router.post('/import', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
