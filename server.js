@@ -15,6 +15,7 @@ const fileRoutes = require('./routes/files');
 const adminRoutes = require('./routes/admin');
 const eligibilityCheckRoutes = require('./routes/eligibilityCheckRoutes');
 const loanApplicationsRouter = require('./routes/loanApplications');
+const reviewRoutes = require('./routes/reviews'); // Import review routes
 
 // Load environment variables from .env file
 dotenv.config();
@@ -50,6 +51,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/admin', adminRoutes); // Include admin routes
 app.use('/api/eligibility-check', upload.single('bankStatements'), eligibilityCheckRoutes); // Include eligibility check routes with multer
 app.use('/api/loan-applications', loanApplicationsRouter); // Include loan applications routes
+app.use('/api/reviews', reviewRoutes); // Include review routes
 
 // Catch-all handler to serve the React app
 app.get('*', (req, res) => {
