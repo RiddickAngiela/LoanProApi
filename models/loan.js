@@ -1,8 +1,15 @@
 // models/loan.js
 'use strict';
+const { Model, DataTypes } = require('sequelize');
 
-module.exports = (sequelize, DataTypes) => {
-  const Loan = sequelize.define('Loan', {
+module.exports = (sequelize) => {
+  class Loan extends Model {
+    static associate(models) {
+      // Define associations here
+    }
+  }
+
+  Loan.init({
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -15,11 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-  }, {});
-  
-  Loan.associate = function(models) {
-    // associations can be defined here
-  };
+  }, {
+    sequelize,
+    modelName: 'Loan',
+  });
 
   return Loan;
 };
