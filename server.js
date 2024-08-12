@@ -3,9 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
-const multer = require('multer'); // Import multer
-
-// Import models
+const multer = require('multer');
 const { sequelize } = require('./models');
 
 // Import routes
@@ -15,7 +13,7 @@ const fileRoutes = require('./routes/files');
 const adminRoutes = require('./routes/admin');
 const eligibilityCheckRoutes = require('./routes/eligibilityCheckRoutes');
 const loanApplicationsRouter = require('./routes/loanApplications');
-const reviewRoutes = require('./routes/reviews'); // Import review routes
+const reviewRoutes = require('./routes/reviews');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -26,32 +24,43 @@ const PORT = process.env.PORT || 3000;
 // Multer configuration for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Specify upload directory
+    cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique filename
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-const upload = multer({ storage }); // Create multer instance with configuration
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'), false);
+    }
+  }
+});
 
 // Middleware
-app.use(cors()); // Use CORS middleware
-app.use(bodyParser.json()); // Parse JSON bodies
-app.use(bodyParser.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use('/uploads', express.static('uploads')); // Serve static files from uploads
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/uploads', express.static('uploads'));
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/files', fileRoutes);
-app.use('/api/admin', adminRoutes); // Include admin routes
-app.use('/api/eligibility-check', upload.single('bankStatements'), eligibilityCheckRoutes); // Include eligibility check routes with multer
-app.use('/api/loan-applications', loanApplicationsRouter); // Include loan applications routes
-app.use('/api/reviews', reviewRoutes); // Include review routes
+app.use('/api/admin', adminRoutes);
+app.use('/api/eligibility-check', upload.single('bankStatements'), eligibilityCheckRoutes);
+app.use('/api/loan-applications', loanApplicationsRouter);
+app.use('/api/reviews', reviewRoutes);
+
+// Serve static files from React app
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Catch-all handler to serve the React app
 app.get('*', (req, res) => {
@@ -60,22 +69,43 @@ app.get('*', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log error stack
-  res.status(500).send('Something broke!'); // Send generic error response
+  if (err instanceof multer.MulterError) {
+    res.status(400).json({ error: err.message });
+  } else if (err) {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } else {
+    next();
+  }
 });
 
 // Sync models with the database and start the server
 const startServer = async () => {
   try {
-    await sequelize.authenticate(); // Authenticate database connection
-    await sequelize.sync(); // Sync models with the database
+    await sequelize.authenticate();
+    await sequelize.sync();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Error syncing database:', error); // Log sync errors
-    process.exit(1); // Exit process with error code
+    console.error('Error syncing database:', error);
+    process.exit(1);
   }
 };
+
+// Handle graceful shutdown
+const handleShutdown = (signal) => {
+  console.log(`Received ${signal}. Closing HTTP server.`);
+  server.close(() => {
+    console.log('HTTP server closed.');
+    sequelize.close().then(() => {
+      console.log('Database connection closed.');
+      process.exit(0);
+    });
+  });
+};
+
+process.on('SIGTERM', () => handleShutdown('SIGTERM'));
+process.on('SIGINT', () => handleShutdown('SIGINT'));
 
 startServer();

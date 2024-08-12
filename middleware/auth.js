@@ -1,5 +1,5 @@
-// middleware/auth.js
 const jwt = require('jsonwebtoken');
+const tokenBlacklist = require('./tokenBlacklist'); // Import the blacklist
 
 // Authentication middleware
 const auth = (req, res, next) => {
@@ -9,8 +9,11 @@ const auth = (req, res, next) => {
     return res.status(401).json({ error: 'No token, authorization denied' });
   }
 
+  if (tokenBlacklist.has(token)) {
+    return res.status(401).json({ error: 'Token has been invalidated' });
+  }
+
   try {
-    // Verify token using the secret from environment variables
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
