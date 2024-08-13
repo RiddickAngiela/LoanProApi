@@ -14,17 +14,16 @@ exports.getReviews = async (req, res) => {
 // Create a new review
 exports.createReview = async (req, res) => {
   try {
-    const { review, rating, image } = req.body;
+    const { review, rating, image, username } = req.body;
 
     if (!review || rating === undefined) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const username = req.user?.username;
 
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required' });
-    }
+     if (!username) {
+       return res.status(400).json({ error: 'Username is required' });
+     }
 
     const newReview = await Review.create({
       username,

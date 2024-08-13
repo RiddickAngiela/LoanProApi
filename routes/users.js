@@ -60,4 +60,7 @@ router.delete('/:id', auth, admin, async (req, res) => {
   }
 });
 
+
+router.get('/profile', auth, userController.getUserDetails);
+
 module.exports = router;

@@ -15,6 +15,7 @@ module.exports = (sequelize) => {
     idNumber: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
     age: {
       type: DataTypes.INTEGER,

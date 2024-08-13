@@ -7,7 +7,7 @@ const { auth, admin } = require('../middleware/auth');
 router.get('/', reviewsController.getReviews); // Ensure getReviews is defined and imported correctly
 
 // Route to create a new review
-router.post('/', auth, reviewsController.createReview);
+router.post('/', reviewsController.createReview);
 
 // Admin route to delete a review
 router.delete('/:id', auth, admin, reviewsController.deleteReview);
