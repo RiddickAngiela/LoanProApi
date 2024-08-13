@@ -18,13 +18,10 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Encrypt the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create a new user
     const newUser = await User.create({
       email,
-      password: hashedPassword,
+      password,
       firstName,
       lastName
     });
@@ -45,9 +42,15 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(user.password);
+    console.log(hashedPassword);
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log(isMatch);
+        console.log(password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }

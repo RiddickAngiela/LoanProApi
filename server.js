@@ -5,8 +5,9 @@ const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const { sequelize } = require('./models');
+const profileRoutes = require('./routes/profile'); // Profile routes import
 
-// Import routes
+// Import other routes
 const userRoutes = require('./routes/users');
 const loanRoutes = require('./routes/loans');
 const fileRoutes = require('./routes/files');
@@ -33,7 +34,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
     if (allowedTypes.includes(file.mimetype)) {
@@ -44,13 +45,13 @@ const upload = multer({
   }
 });
 
-// Middleware
+// Middleware setup
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static('uploads'));
 
-// Use routes
+// Route handlers
 app.use('/api/users', userRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/files', fileRoutes);
@@ -58,14 +59,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/eligibility-check', upload.single('bankStatements'), eligibilityCheckRoutes);
 app.use('/api/loan-applications', loanApplicationsRouter);
 app.use('/api/reviews', reviewRoutes);
-
-// Serve static files from React app
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-// Catch-all handler to serve the React app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
+app.use('/api/profile', profileRoutes); // Profile routes
 
 // Error handling middleware
 app.use((err, req, res, next) => {

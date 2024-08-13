@@ -1,4 +1,3 @@
-// controllers/reviewsController.js
 const { Review } = require('../models');
 
 // Get all reviews
@@ -15,17 +14,21 @@ exports.getReviews = async (req, res) => {
 // Create a new review
 exports.createReview = async (req, res) => {
   try {
-    const { review, rating, username, image } = req.body;
+    const { review, rating, image } = req.body;
 
-    // Check if necessary fields are provided
     if (!review || rating === undefined) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Create a new review using data from req.body
+    const username = req.user?.username;
+
+    if (!username) {
+      return res.status(400).json({ error: 'Username is required' });
+    }
+
     const newReview = await Review.create({
-      username: username || 'Anonymous', // Use 'Anonymous' if username is not provided
-      image: image || null, // Use null if no image is provided
+      username,
+      image: image || null,
       review,
       rating,
     });
@@ -33,6 +36,24 @@ exports.createReview = async (req, res) => {
     res.status(201).json(newReview);
   } catch (error) {
     console.error('Error creating review:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Delete a review
+exports.deleteReview = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const review = await Review.findByPk(id);
+
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    await review.destroy();
+    res.status(200).json({ message: 'Review deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting review:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
