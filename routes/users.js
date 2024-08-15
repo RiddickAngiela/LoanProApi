@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { auth, admin } = require('../middleware/auth');
 const userController = require('../controllers/userController');
-const { User } = require('../models'); // Import User model
+const { upload, resizeImage } = require('../utils/uploads');
+const { User } = require('../models');
 
 // Register a new user
 router.post('/register', userController.registerUser);
@@ -58,6 +59,25 @@ router.delete('/:id', auth, admin, async (req, res) => {
     res.status(200).json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Error deleting user' });
+  }
+});
+
+// Upload profile image
+router.post('/profile/image', auth, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const resizedImagePath = await resizeImage(req.file.path, 800, 800);
+
+    const user = await User.findByPk(req.user.id);
+    user.profilePicture = resizedImagePath;
+    await user.save();
+
+    res.status(200).json({ message: 'Image uploaded and resized successfully', imagePath: resizedImagePath });
+  } catch (error) {
+    res.status(500).json({ error: 'Error processing image' });
   }
 });
 
