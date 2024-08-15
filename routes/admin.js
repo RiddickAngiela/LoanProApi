@@ -1,9 +1,6 @@
-// routes/admin.js
 const express = require('express');
 const router = express.Router();
 const { auth, admin } = require('../middleware/auth');
-
-// Define your admin routes here
 
 // Example: Get all loans (admin only)
 router.get('/loans', auth, admin, async (req, res) => {

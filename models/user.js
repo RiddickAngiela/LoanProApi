@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
+      validate: {
+        isEmail: true, // Ensures the email format is valid
+      },
     },
     password: {
       type: DataTypes.STRING,
@@ -16,21 +19,6 @@ module.exports = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.STRING,
       defaultValue: 'user',
-    },
-  }, {
-    hooks: {
-      // Hash password before saving
-      beforeSave: async (user, options) => {
-        if (user.changed('password')) {
-          try {
-            const salt = await bcrypt.genSalt(10);
-            user.password = await bcrypt.hash(user.password, salt);
-          } catch (error) {
-            console.error('Error hashing password:', error);
-            throw new Error('Unable to hash password');
-          }
-        }
-      },
     },
   });
 
@@ -49,12 +37,17 @@ module.exports = (sequelize, DataTypes) => {
     if (!process.env.JWT_SECRET) {
       throw new Error('JWT_SECRET is not defined');
     }
-    return jwt.sign({ id: this.id, role: this.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(
+      { id: this.id, role: this.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
   };
 
   // Define associations if any
   User.associate = function (models) {
     // Define associations here
+    // Example: User.hasMany(models.Post); (if you have a Post model)
   };
 
   return User;

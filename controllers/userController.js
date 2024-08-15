@@ -49,6 +49,8 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
+    console.log(password);
+
     // Find user by email
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -56,7 +58,14 @@ const loginUser = async (req, res) => {
     }
 
     // Compare provided password with stored hashed password
+    const isMatch2 = await user.comparePassword(password);
+    console.log(isMatch2);
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log(isMatch);
+   
+    console.log(user.password);
+   
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -120,4 +129,3 @@ const getUserDetails = async (req, res) => {
 };
 
 module.exports = { registerUser, loginUser, signOutUser, getUserDetails };
-
