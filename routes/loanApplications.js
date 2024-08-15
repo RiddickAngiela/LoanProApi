@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { createApplication } = require('../controllers/LoanApplicationController');
+const { createApplication, getApplicationById } = require('../controllers/LoanApplicationController');
+
 
 router.post('/submit', createApplication);
+
+router.get('/:id', getApplicationById);
 
 module.exports = router;

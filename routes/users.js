@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { auth, admin } = require('../middleware/auth');
 const userController = require('../controllers/userController');
+const { User } = require('../models'); // Import User model
 
 // Register a new user
 router.post('/register', userController.registerUser);
@@ -60,7 +61,7 @@ router.delete('/:id', auth, admin, async (req, res) => {
   }
 });
 
-
+// Get authenticated user's profile
 router.get('/profile', auth, userController.getUserDetails);
 
 module.exports = router;

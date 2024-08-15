@@ -64,3 +64,4 @@ const zipFiles = (filePaths, zipPath) => {
 };
 
 module.exports = { upload, resizeImage, zipFiles };
+
