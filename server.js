@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 const multer = require('multer');
 const { sequelize } = require('./models'); // Ensure this import matches your file structure
 const loanApplicationsRouter = require('./routes/loanApplications');
+const loanApprovalRoutes = require('./routes/loanapproval');
 
 dotenv.config();
 
@@ -48,6 +49,7 @@ app.use('/api/files', require('./routes/files'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/eligibility-check', upload.single('bankStatements'), require('./routes/eligibilityCheckRoutes'));
 app.use('/api/loan-applications', loanApplicationsRouter);
+app.use('/api/loanapproval', loanApprovalRoutes);
 app.use('/api/reviews', require('./routes/reviews'));
 app.use('/api/profile', require('./routes/profile'));
 
