@@ -1,4 +1,3 @@
-// models/eligibilityCheck.js
 'use strict';
 const { DataTypes } = require('sequelize');
 
@@ -6,51 +5,51 @@ module.exports = (sequelize) => {
   const EligibilityCheck = sequelize.define('EligibilityCheck', {
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     idNumber: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: true
     },
     age: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: false
     },
     bankStatements: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
     employmentStatus: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     workId: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     nextOfKin: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     accountNumber: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     dateOfBirth: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: false
     },
     gender: {
       type: DataTypes.STRING,
-      allowNull: false,
-    },
+      allowNull: false
+    }
   }, {
-    timestamps: true,
+    timestamps: true
   });
 
   return EligibilityCheck;

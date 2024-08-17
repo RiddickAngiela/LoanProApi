@@ -1,10 +1,10 @@
-const { LoanApplication } = require('../models');
+const { LoanApplication } = require('../models'); // Adjust path if necessary
 
 exports.createApplication = async (req, res) => {
   try {
     const { fullName, dob, address, annualIncome, loanAmount, loanPurpose, repaymentTerm } = req.body;
 
-    if (!fullName || !dob || !address || !annualIncome || !loanAmount || !loanPurpose || !repaymentTerm) {
+    if (!fullName || !dob || !address || !annualIncome || !loanAmount || !loanPurpose || !repaymentTerm ) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 

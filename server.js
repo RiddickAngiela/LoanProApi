@@ -4,19 +4,9 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
-const { sequelize } = require('./models');
-const profileRoutes = require('./routes/profile'); // Profile routes import
-
-// Import other routes
-const userRoutes = require('./routes/users');
-const loanRoutes = require('./routes/loans');
-const fileRoutes = require('./routes/files');
-const adminRoutes = require('./routes/admin');
-const eligibilityCheckRoutes = require('./routes/eligibilityCheckRoutes');
+const { sequelize } = require('./models'); // Ensure this import matches your file structure
 const loanApplicationsRouter = require('./routes/loanApplications');
-const reviewRoutes = require('./routes/reviews');
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
@@ -49,17 +39,17 @@ const upload = multer({
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/uploads',  express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Route handlers
-app.use('/api/users', userRoutes);
-app.use('/api/loans', loanRoutes);
-app.use('/api/files', fileRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/eligibility-check', upload.single('bankStatements'), eligibilityCheckRoutes);
+app.use('/api/users', require('./routes/users'));
+app.use('/api/loans', require('./routes/loans'));
+app.use('/api/files', require('./routes/files'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/eligibility-check', upload.single('bankStatements'), require('./routes/eligibilityCheckRoutes'));
 app.use('/api/loan-applications', loanApplicationsRouter);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/profile', profileRoutes); // Profile routes
+app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/profile', require('./routes/profile'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -90,7 +80,7 @@ const startServer = async () => {
 // Handle graceful shutdown
 const handleShutdown = (signal) => {
   console.log(`Received ${signal}. Closing HTTP server.`);
-  server.close(() => {
+  app.close(() => {
     console.log('HTTP server closed.');
     sequelize.close().then(() => {
       console.log('Database connection closed.');

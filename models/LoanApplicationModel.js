@@ -1,4 +1,7 @@
-module.exports = (sequelize, DataTypes) => {
+'use strict';
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const LoanApplication = sequelize.define('LoanApplication', {
     fullName: {
       type: DataTypes.STRING,
@@ -27,8 +30,13 @@ module.exports = (sequelize, DataTypes) => {
     repaymentTerm: {
       type: DataTypes.INTEGER,
       allowNull: false
-    }
+    },
+    // status: {
+    //   type: DataTypes.STRING,
+    //   defaultValue: 'pending'
+    // }
   });
 
   return LoanApplication;
 };
+
