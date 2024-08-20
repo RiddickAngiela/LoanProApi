@@ -10,6 +10,13 @@ const loanApprovalRoutes = require('./routes/loanapproval');
 
 dotenv.config();
 
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+// Initialize the Gemini API client
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -90,6 +97,30 @@ const handleShutdown = (signal) => {
     });
   });
 };
+
+// API endpoint to get LOAN details
+app.post('/api/loans-Ai', async (req, res) => {
+  const { loanInfo } = req.body;
+
+  if (!loanInfo) {
+      return res.status(400).json({ error: 'Loan name is required' });
+  }
+
+  try {
+      // Create a prompt to get ingredients and nutritional values
+      const prompt = "Anything about loans and financial literacy only";
+
+      // Generate content using the Gemini API
+      const result = await model.generateContent(prompt);  
+      const response = await result.response;
+
+      // Send the generated details back to the client
+      res.json({ details: response.text() });
+  } catch (error) {
+      console.error('Error generating loan details:', error);
+      res.status(500).json({ error: 'Failed to generate loan details' });
+  }
+});
 
 process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 process.on('SIGINT', () => handleShutdown('SIGINT'));
