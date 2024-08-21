@@ -10,6 +10,6 @@ router.get('/', reviewsController.getReviews); // Ensure getReviews is defined a
 router.post('/', reviewsController.createReview);
 
 // Admin route to delete a review
-router.delete('/:id', auth, admin, reviewsController.deleteReview);
+router.delete('/:id', auth, reviewsController.deleteReview);
 
 module.exports = router;
