@@ -108,7 +108,7 @@ app.post('/api/loans-Ai', async (req, res) => {
 
   try {
       // Create a prompt to get ingredients and nutritional values
-      const prompt = "Anything about loans and financial literacy only";
+      const prompt = `Anything about loans and financial literacy only ${loanInfo} `;
 
       // Generate content using the Gemini API
       const result = await model.generateContent(prompt);  
