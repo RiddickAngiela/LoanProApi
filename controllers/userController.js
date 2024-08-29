@@ -5,7 +5,7 @@ const { User, Profile } = require('../models');
 // Handle user registration
 const registerUser = async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, role } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
@@ -23,23 +23,37 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       firstName,
-      lastName
+      lastName,
+      role: role || 'user', // Default role to 'user' if not provided
     });
 
     // Create profile for the new user
-    await Profile.create({
+    const profile = await Profile.create({
       username: email, // Assuming email as username or modify as needed
       email,
       firstName,
-      lastName
+      lastName,
     });
 
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      profile
+    });
   } catch (error) {
+    console.error('Registration Error:', error.message);  // Log the error to identify the issue
     res.status(500).json({ error: 'Server error' });
   }
 };
 
+// Handle user login
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -49,8 +63,6 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    console.log(password);
-
     // Find user by email
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -58,14 +70,7 @@ const loginUser = async (req, res) => {
     }
 
     // Compare provided password with stored hashed password
-    const isMatch2 = await user.comparePassword(password);
-    console.log(isMatch2);
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    console.log(isMatch);
-   
-    console.log(user.password);
-   
+    const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -80,7 +85,6 @@ const loginUser = async (req, res) => {
     // Fetch profile or create it if it doesn't exist
     let profile = await Profile.findOne({ where: { username: email } });
     if (!profile) {
-      // Create a new profile if it doesn't exist
       profile = await Profile.create({
         username: email,
         email,
@@ -96,11 +100,8 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 // Handle user logout (Client-side only)
 const signOutUser = (req, res) => {
-  // Logout action on the server is typically handled on the client side by removing the token
-  // So this route might not require a server-side implementation
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
@@ -109,14 +110,14 @@ const getUserDetails = async (req, res) => {
   try {
     const { id } = req.user; // Assuming user ID is available from the authenticated token
     const user = await User.findByPk(id, {
-      attributes: ['firstName', 'lastName', 'email']
+      attributes: ['firstName', 'lastName', 'email', 'role'], // Include role in the response
     });
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Optionally, you can also fetch the user's profile here
+    // Fetch the user's profile
     const profile = await Profile.findOne({ where: { username: user.email } });
     if (!profile) {
       return res.status(404).json({ error: 'Profile not found' });
@@ -124,6 +125,7 @@ const getUserDetails = async (req, res) => {
 
     res.status(200).json({ user, profile });
   } catch (error) {
+    console.error('Error fetching user details:', error.message);  // Log the error to identify the issue
     res.status(500).json({ error: 'Internal server error' });
   }
 };
